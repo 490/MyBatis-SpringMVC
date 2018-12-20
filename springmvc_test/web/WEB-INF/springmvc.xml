@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd ">
+
+
+    <!--处理器映射器-->
+	<!--bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/-->
+    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="/queryFruits_test1">fruitsController</prop>
+                <prop key="/queryFruits_test2">fruitsController</prop>
+                <prop key="/queryFruits_test3">fruitsController2</prop>
+            </props>
+        </property>
+    </bean>
+    <bean id="fruitsController" class="controller.FruitsControllerTest"/>
+    <bean id="fruitsController2" class="controller.FruitsControllerTest2"/>
+	<!--处理器适配器-->
+    <!--bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/-->
+	<bean class="org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter"/>
+
+    <!--注解方式>
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/-->
+    <mvc:annotation-driven validator="validator" conversion-service="conversionService"></mvc:annotation-driven>
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+        <property name="validationMessageSource" ref="messageSource"/>
+    </bean>
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>ProductValidationMessages</value>
+            </list>
+        </property>
+        <property name="fileEncodings" value="utf-8"/>
+        <property name="cacheSeconds" value="120"/>
+    </bean>
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean"/>
+
+
+    <context:component-scan base-package="controller"></context:component-scan>
+
+    <!--视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp"/>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+
+    <!--被url映射的handler-->
+    <bean name="/queryFruits_test" class="controller.FruitsControllerTest"/>
+
+    <bean class="exception.UserExceptionResolver"></bean>
+
+    <!--拦截器>
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="interceptor.HandlerInterceptorDemo1"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="interceptor.HandlerInterceptorDemo2"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors-->
+
+    <!--文件上传-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize">
+            <value>5242880</value>
+        </property>
+    </bean>
+    <!--静态资源解析>
+    <mvc:resources mapping="/js/**" location="/js/"/>
+    <mvc:resources mapping="/img/**" location="/img/"/>
+    <mvc:resources mapping="/css/**" location="/css/"/-->
+    <mvc:default-servlet-handler/>
+</beans>
